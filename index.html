@@ -154,13 +154,14 @@ function choicesFor(it){return it.mode==='veh'?[['vA',P.vehA],['vB',P.vehB],['pe
 function labelOf(v){const m={biz:'사업 관련',personal:'개인 사용',entertain:'접대',unknown:'모르겠음',office:'사무실에서 알아서 처리',vA:P.vehA,vB:P.vehB};return m[v]||'';}
 function saveDraft(){try{localStorage.setItem('cr:'+K,JSON.stringify(A));}catch(e){}}
 function summaryHTML(){
-  const t=P.totals,F=P.first,o=[t.Y[0]+t.N[0],t.Y[1]+t.N[1]];
+  const t=P.totals,F=P.first,o=[t.Y[0]+t.N[0],t.Y[1]+t.N[1]],X=(F&&F.X)||[0,0];
   const head='<div class="card"><h2>이번 기간 카드 사용 요약</h2><div class="scroll"><table class="ledger"><thead><tr><th scope="col">구분</th><th scope="col">건수</th><th scope="col">금액</th></tr></thead><tbody>';
   if(F){
     return head+
      '<tr><td>총 사용</td><td class="num">'+cnt(t.all[0])+'</td><td class="num">'+won(t.all[1])+'</td></tr>'+
      '<tr class="sub"><td><span class="badge b-ok">공제</span> 사무소 분류</td><td class="num">'+cnt(F.Y[0])+'</td><td class="num">'+won(F.Y[1])+'</td></tr>'+
      '<tr class="sub"><td><span class="badge b-no">불공제</span> 사무소 분류</td><td class="num">'+cnt(F.N[0])+'</td><td class="num">'+won(F.N[1])+'</td></tr>'+
+     (X[0]?'<tr class="sub"><td><span class="badge">면세·간이</span> 판단 대상 아님</td><td class="num">'+cnt(X[0])+'</td><td class="num">'+won(X[1])+'</td></tr>':'')+
      '<tr class="ask"><td>확인 요청 (위 건 중)</td><td class="num">'+cnt(t.R[0])+'</td><td class="num">'+won(t.R[1])+'</td></tr>'+
      '</tbody></table></div><p class="note">공제·불공제는 사무소가 위하고에서 1차로 분류한 결과입니다. 이 중 확인이 필요한 건(확인 요청'+(F.RN[0]||F.RY[0]?': 불공제 분류 '+cnt(F.RN[0])+(F.RY[0]?', 공제 분류 '+cnt(F.RY[0]):''):'')+')만 아래에서 답해 주세요.</p></div>';
   }
