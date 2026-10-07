@@ -107,9 +107,11 @@ function msgPage(title,body){root.innerHTML='<div class="card"><h1>'+esc(title)+
 async function init(){
   if(!/^[a-z0-9]{4,32}$/.test(K)){msgPage('링크를 확인해 주세요','문자로 받으신 링크를 그대로 다시 열어 주세요.');return;}
   try{
-    const r=await fetch(new URL('data/'+K+'.json',location.href).href,{cache:'no-store'});
-    if(!r.ok)throw new Error('http');
-    FILE=await r.json();
+    FILE=null;
+    if(DATA_API){try{const r0=await fetch(DATA_API+'?k='+K,{cache:'no-store'});const j0=await r0.json();if(j0&&j0.ok&&j0.file)FILE=JSON.parse(j0.file);}catch(e){FILE=null;}}
+    if(!FILE){const r=await fetch(new URL('data/'+K+'.json',location.href).href,{cache:'no-store'});
+      if(!r.ok)throw new Error('http');
+      FILE=await r.json();}
   }catch(e){msgPage('링크가 만료되었거나 올바르지 않습니다','사무소에 새 링크를 요청해 주세요.');return;}
   renderLock();
 }
@@ -146,6 +148,7 @@ async function unlock(e){
 }
 
 /* ---------- 화면 ---------- */
+const DATA_API='https://script.google.com/macros/s/AKfycbyCaZLoVDNXIpNr1u14DA8lLlnKkO6oODFensF0n7JQ6kSPDR66eTWPVJZ2OV8j-hk/exec';
 const CH=[['biz','사업 관련'],['personal','개인 사용'],['entertain','접대'],['unknown','모르겠음'],['office','사무실에서 알아서']];
 function choicesFor(it){return it.mode==='veh'?[['vA',P.vehA],['vB',P.vehB],['personal','개인 사용'],['unknown','모르겠음'],['office','사무실에서 알아서']]:CH;}
 function labelOf(v){const m={biz:'사업 관련',personal:'개인 사용',entertain:'접대',unknown:'모르겠음',office:'사무실에서 알아서 처리',vA:P.vehA,vB:P.vehB};return m[v]||'';}
