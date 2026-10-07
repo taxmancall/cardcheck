@@ -209,7 +209,7 @@ function render(){
       return '<section class="group"><div class="group-head"><div><div class="gname">'+esc(x.m)+'</div><div class="gsum num">'+cnt(x.items.length)+' · '+won(x.total)+'</div></div>'+bulk+'</div><div class="colhead"><span>일자</span><span>내용</span><span style="text-align:right">금액</span><span>사용 목적</span></div>'+x.items.map(itemHTML).join('')+'</section>';
     }).join('');
     h+='<div class="submit">';
-    if(state.submit==='ok')h+='<div class="done" role="status">제출했습니다. 응답 '+s.done+'건, 미응답 '+(P.reqs.length-s.done)+'건입니다. 수정하시면 다시 제출해 주세요.</div>';
+    if(state.submit==='ok')h+='<div class="done" role="status">제출했습니다. 응답 '+s.done+'건, 미응답 '+(P.reqs.length-s.done)+'건입니다. 수정하시면 다시 제출해 주세요.<br><span class="small">'+esc(state.saved||'')+'</span></div>';
     if(state.submit==='demo')h+='<div class="done" role="status">시험 링크입니다. 응답은 전송되지 않았습니다.</div>';
     if(state.submit==='fail'){
       const why={net:'전송하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요. 계속 안 되면 사무소로 연락해 주세요. ',
@@ -263,7 +263,7 @@ async function submit(){
   }catch(err){state.submit='fail';state.why='net';}
   if(res){
     try{j=await res.json();}catch(err){j=null;}
-    if(j&&j.ok)state.submit='ok';
+    if(j&&j.ok){state.submit='ok';state.saved=(j.v?'저장 확인: 새로 '+j.added+'건, 수정 '+j.updated+'건':'(사무소 서버가 이전 버전입니다)');}
     else{state.submit='fail';state.why=j&&(j.error==='unknown_code'||j.error==='bad_code')?'code':'server';}
   }
   state.busy=false;render();
