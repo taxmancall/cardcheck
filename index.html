@@ -201,7 +201,12 @@ function render(){
     h+='<div class="submit">';
     if(state.submit==='ok')h+='<div class="done" role="status">제출했습니다. 응답 '+s.done+'건, 미응답 '+(P.reqs.length-s.done)+'건입니다. 수정하시면 다시 제출해 주세요.</div>';
     if(state.submit==='demo')h+='<div class="done" role="status">시험 링크입니다. 응답은 전송되지 않았습니다.</div>';
-    if(state.submit==='fail')h+='<div class="fail" role="alert">전송하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요. 계속 안 되면 사무소로 연락해 주세요. '+PHONE+'</div>';
+    if(state.submit==='fail'){
+      const why={net:'전송하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요. 계속 안 되면 사무소로 연락해 주세요. ',
+        code:'이 링크가 사무소에 아직 등록되지 않아 저장하지 못했습니다. 응답하신 내용은 이 화면에 남아 있으니, 사무소에 연락해 등록을 요청해 주세요. ',
+        server:'사무소 저장소에서 응답을 받지 못했습니다. 잠시 후 다시 눌러 보시고, 계속 안 되면 사무소로 연락해 주세요. '}[state.why||'net'];
+      h+='<div class="fail" role="alert">'+why+PHONE+'</div>';
+    }
     h+='<p class="small muted">회신 기한 안에 응답이 없는 건은 불공제로 처리합니다. 알려 주신 사용 목적이 사실과 다를 경우의 책임은 사용자에게 있습니다.</p>'+
       '<button type="button" class="btn primary" id="btn-submit"'+(state.busy?' disabled':'')+'>'+(state.busy?'보내는 중...':state.submit==='ok'?'다시 제출하기':'제출하기')+'</button></div>';
   }
@@ -226,13 +231,16 @@ async function submit(){
   if(state.busy)return;
   const items=P.reqs.map(r=>{const a=A[r.id]||{};return{id:r.id,date:r.d,merchant:r.m,amount:r.a,answer:a.a?labelOf(a.a):'',memo:a.memo||''};});
   if(!P.api){state.submit='demo';render();return;}
-  state.busy=true;state.submit='';render();
+  state.busy=true;state.submit='';state.why='';render();
+  let res=null,j=null;
   try{
-    const res=await fetch(P.api,{method:'POST',body:JSON.stringify({k:K,items}),redirect:'follow'});
-    const j=await res.json();
-    if(!j||!j.ok)throw new Error('server');
-    state.submit='ok';
-  }catch(err){state.submit='fail';}
+    res=await fetch(P.api,{method:'POST',body:JSON.stringify({k:K,items}),redirect:'follow'});
+  }catch(err){state.submit='fail';state.why='net';}
+  if(res){
+    try{j=await res.json();}catch(err){j=null;}
+    if(j&&j.ok)state.submit='ok';
+    else{state.submit='fail';state.why=j&&(j.error==='unknown_code'||j.error==='bad_code')?'code':'server';}
+  }
   state.busy=false;render();
 }
 init();
