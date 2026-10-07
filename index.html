@@ -69,6 +69,9 @@ details.criteria[open] summary::after{content:"접기"}
 .memo{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:9px 10px;width:100%;min-width:0}
 .done{border:1px solid var(--ok);background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:12px 14px;font-weight:500}
 .fail{border:1px solid var(--bad);color:var(--bad);border-radius:10px;padding:12px 14px}
+.chk{display:flex;gap:8px;align-items:center;font-size:.88rem;min-height:32px}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.linkbtn{border:0;background:none;color:var(--accent);text-decoration:underline;padding:4px 2px;min-height:32px;font-size:.88rem}
 .submit{display:grid;gap:10px}
 @media (min-width:720px){
   .colhead{display:grid;grid-template-columns:4.2rem minmax(0,1fr) 7.5rem minmax(0,25rem);gap:14px;padding:8px 14px;font-size:.78rem;color:var(--muted);border-bottom:1px solid var(--line)}
@@ -96,7 +99,7 @@ const enc=new TextEncoder(),dec=new TextDecoder();
 const unb64=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;};
 
 const K=((new URLSearchParams(location.search)).get('k')||'').toLowerCase();
-let FILE=null,P=null,A={},state={busy:false,err:'',submit:''};
+let FILE=null,P=null,A={},lastA=null,state={busy:false,err:'',submit:'',note:'',over:false};
 
 function msgPage(title,body){root.innerHTML='<div class="card"><h1>'+esc(title)+'</h1><p class="muted">'+esc(body)+'</p><p class="small muted">문의 '+PHONE+'</p></div>';}
 
@@ -143,9 +146,9 @@ async function unlock(e){
 }
 
 /* ---------- 화면 ---------- */
-const CH=[['biz','사업 관련'],['personal','개인 사용'],['entertain','접대'],['unknown','모르겠음']];
-function choicesFor(it){return it.mode==='veh'?[['vA',P.vehA],['vB',P.vehB],['personal','개인 사용'],['unknown','모르겠음']]:CH;}
-function labelOf(v){const m={biz:'사업 관련',personal:'개인 사용',entertain:'접대',unknown:'모르겠음',vA:P.vehA,vB:P.vehB};return m[v]||'';}
+const CH=[['biz','사업 관련'],['personal','개인 사용'],['entertain','접대'],['unknown','모르겠음'],['office','사무실에서 알아서']];
+function choicesFor(it){return it.mode==='veh'?[['vA',P.vehA],['vB',P.vehB],['personal','개인 사용'],['unknown','모르겠음'],['office','사무실에서 알아서']]:CH;}
+function labelOf(v){const m={biz:'사업 관련',personal:'개인 사용',entertain:'접대',unknown:'모르겠음',office:'사무실에서 알아서 처리',vA:P.vehA,vB:P.vehB};return m[v]||'';}
 function saveDraft(){try{localStorage.setItem('cr:'+K,JSON.stringify(A));}catch(e){}}
 function summaryHTML(){
   const t=P.totals,o=[t.Y[0]+t.N[0],t.Y[1]+t.N[1]];
@@ -192,7 +195,11 @@ function render(){
   else{
     const g=new Map();P.reqs.forEach(r=>{if(!g.has(r.m))g.set(r.m,[]);g.get(r.m).push(r);});
     const arr=[...g.entries()].map(([m,items])=>({m,items:items.slice().sort((a,b)=>b.a-a.a),total:items.reduce((x,r)=>x+r.a,0)})).sort((a,b)=>b.total-a.total);
-    h+='<p class="small muted">금액이 큰 가맹점부터 보여 드립니다. 같은 가맹점은 한 번에 응답할 수 있습니다.</p>';
+    h+='<div class="card" id="bulk-all"><div><h2>한 번에 선택</h2><p class="small muted">아래 판단 요청 '+cnt(P.reqs.length)+'에 같은 답을 한 번에 적용합니다. 건별로 다시 바꿀 수 있습니다.</p></div>'+
+      '<div class="choices" role="group" aria-label="전체 선택">'+[['biz','전체 사업 관련'],['entertain','전체 접대'],['personal','전체 개인 사용'],['unknown','전체 모르겠음'],['office','전체 사무실에서 알아서']].map(c=>'<button type="button" data-all="'+c[0]+'">'+c[1]+'</button>').join('')+'</div>'+
+      '<p class="small muted">"사무실에서 알아서"를 고르시면 사무실이 판단합니다. 사업 관련 근거가 확인되지 않는 건은 불공제로 처리될 수 있습니다.</p>'+'<label class="chk"><input type="checkbox" id="all-over"'+(state.over?' checked':'')+'> 이미 응답한 건도 바꾸기</label>'+
+      '<p class="small" id="all-note" role="status">'+esc(state.note)+(lastA?' <button type="button" class="linkbtn" id="btn-undo">되돌리기</button>':'')+'</p></div>';
+    h+='<p class="small muted">금액이 큰 가맹점부터 보여 드립니다. 같은 가맹점은 한 번에 응답할 수도 있습니다.</p>';
     h+=arr.map(x=>{
       const veh=x.items[0].mode==='veh';
       const bulk=x.items.length>1?'<div class="bulk" data-m="'+esc(x.m)+'">'+(veh?'<button type="button" data-bulk="vA">전체 '+esc(P.vehA)+'</button><button type="button" data-bulk="vB">전체 '+esc(P.vehB)+'</button>':'<button type="button" data-bulk="biz">전체 사업 관련</button><button type="button" data-bulk="personal">전체 개인 사용</button>')+'</div>':'';
@@ -218,18 +225,33 @@ function refresh(){const s=stats();const d=$('#p-done');if(d)d.textContent=s.don
 /* ---------- 이벤트 ---------- */
 root.addEventListener('click',e=>{
   if(!P)return;
+  const al=e.target.closest('[data-all]');
+  if(al){
+    const v=al.dataset.all;lastA=JSON.stringify(A);let n=0,kept=0,skip=0;
+    P.reqs.forEach(r=>{
+      const cur=A[r.id]||{};
+      if(cur.a&&!state.over){kept++;return;}
+      if(r.mode==='veh'&&(v==='biz'||v==='entertain')){skip++;return;}
+      A[r.id]={a:v,memo:cur.memo||'',bulk:true};n++;
+    });
+    state.note=n+'건에 "'+labelOf(v)+'"을 적용했습니다.'+(kept?' 이미 응답한 '+kept+'건은 그대로 두었습니다.':'')+(skip?' 차량 '+skip+'건은 어느 차량인지 직접 골라 주세요.':'');
+    if(!n)lastA=null;
+    state.submit='';saveDraft();render();return;
+  }
+  if(e.target.id==='btn-undo'&&lastA){A=JSON.parse(lastA);lastA=null;state.note='방금 적용한 선택을 되돌렸습니다.';state.submit='';saveDraft();render();return;}
   const ab=e.target.closest('[data-ans]');
   if(ab){const id=ab.closest('.item').dataset.id,cur=A[id]||{};A[id]={a:cur.a===ab.dataset.ans?null:ab.dataset.ans,memo:cur.memo||''};state.submit='';saveDraft();render();return;}
   const bb=e.target.closest('[data-bulk]');
   if(bb){const m=bb.closest('.bulk').dataset.m;P.reqs.filter(r=>r.m===m).forEach(r=>{const cur=A[r.id]||{};A[r.id]={a:bb.dataset.bulk,memo:cur.memo||''};});state.submit='';saveDraft();render();return;}
   if(e.target.id==='btn-submit')submit();
 });
+root.addEventListener('change',e=>{if(e.target.id==='all-over')state.over=e.target.checked;});
 root.addEventListener('input',e=>{
   if(P&&e.target.matches('[data-memo]')){const id=e.target.closest('.item').dataset.id,cur=A[id]||{};A[id]={a:cur.a||null,memo:e.target.value};saveDraft();}
 });
 async function submit(){
   if(state.busy)return;
-  const items=P.reqs.map(r=>{const a=A[r.id]||{};return{id:r.id,date:r.d,merchant:r.m,amount:r.a,answer:a.a?labelOf(a.a):'',memo:a.memo||''};});
+  const items=P.reqs.map(r=>{const a=A[r.id]||{};return{id:r.id,date:r.d,merchant:r.m,amount:r.a,answer:a.a?labelOf(a.a)+(a.bulk?' (전체 선택)':''):'',memo:a.memo||''};});
   if(!P.api){state.submit='demo';render();return;}
   state.busy=true;state.submit='';state.why='';render();
   let res=null,j=null;
