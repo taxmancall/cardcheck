@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>카드 사용 확인 | 원제우세무사사무소</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#F4F6F7;--surface:#FFFFFF;--ink:#16232B;--muted:#586873;--line:#D8DFE3;--accent:#0E6B78;--accent-ink:#FFFFFF;
+--ok:#1B7A4B;--ok-soft:#DFF1E6;--no:#56636D;--no-soft:#E5E9EC;--ask:#9A5400;--ask-soft:#FBEBD0;--bad:#B3261E;
+--f-body:'Noto Sans KR',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;--f-num:'IBM Plex Mono',ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#0F171C;--surface:#172229;--ink:#E6EDF0;--muted:#93A4AE;--line:#2A3A44;--accent:#5FC2CF;--accent-ink:#06262B;
+--ok:#6CCB97;--ok-soft:#173326;--no:#A9B6BE;--no-soft:#25323A;--ask:#F0B35C;--ask-soft:#3A2B12;--bad:#FF8A80;color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body)}
+.wrap{max-width:960px;margin:0 auto;padding-block:max(20px,env(safe-area-inset-top,0px)) calc(56px + env(safe-area-inset-bottom,0px));padding-inline:clamp(16px,4vw,32px);display:grid;gap:16px}
+h1,h2,h3{margin:0;line-height:1.3;text-wrap:balance}h1{font-size:1.2rem}h2{font-size:1.05rem}
+p{margin:0}.muted{color:var(--muted)}.small{font-size:.85rem}.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:11px 16px;font-weight:500;min-height:44px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.55;cursor:default}
+.field{display:grid;gap:4px}.field label{font-size:.82rem;color:var(--muted);font-weight:500}
+.field input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:11px 12px;width:100%;min-height:46px}
+.err{color:var(--bad);font-size:.88rem}
+.badge{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:99px;white-space:nowrap}
+.b-ok{background:var(--ok-soft);color:var(--ok)}.b-no{background:var(--no-soft);color:var(--no)}.b-ask{background:var(--ask-soft);color:var(--ask)}
+.scroll{overflow-x:auto}
+.ledger{width:100%;border-collapse:collapse}
+.ledger th{font-size:.78rem;font-weight:500;color:var(--muted);text-align:right;padding:0 0 8px}.ledger th:first-child{text-align:left}
+.ledger td{padding:10px 0;border-top:1px solid var(--line);text-align:right;white-space:nowrap}.ledger td:first-child{text-align:left;white-space:normal}
+.ledger tr.sub td{padding:6px 0;border-top:0;font-size:.88rem;color:var(--muted)}.ledger tr.sub td:first-child{padding-left:18px}
+.ledger tr.ask td{background:var(--ask-soft);border-top:1px solid var(--line)}
+.ledger tr.ask td:first-child{padding-left:10px;font-weight:700}.ledger tr.ask td:last-child{padding-right:10px}.ledger tr.ask td:nth-child(2){padding-right:8px}
+.note{font-size:.8rem;color:var(--muted)}
+details.criteria{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+details.criteria summary{padding:14px 18px;cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center}
+details.criteria summary::-webkit-details-marker{display:none}
+details.criteria summary::after{content:"펼치기";font-size:.8rem;font-weight:500;color:var(--muted);white-space:nowrap}
+details.criteria[open] summary::after{content:"접기"}
+.crit-body{padding:0 18px 16px}
+.crit{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line)}
+.crit-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.crit .basis{font-size:.78rem;color:var(--muted)}
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:grid;gap:6px}
+.progress .bar{height:6px;border-radius:99px;background:var(--no-soft);overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.progress .line{display:flex;justify-content:space-between;gap:10px;font-size:.85rem}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.group-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-bottom:1px solid var(--line)}
+.gname{font-weight:700;min-width:0;overflow-wrap:anywhere}.gsum{font-size:.82rem;color:var(--muted)}
+.bulk{display:flex;flex-wrap:wrap;gap:6px}
+.bulk button{font-size:.8rem;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);min-height:34px}
+.colhead{display:none}
+.item{display:grid;gap:10px;padding:14px;border-top:1px solid var(--line);min-width:0}
+.group .colhead+.item{border-top:0}
+.item-main{display:grid;gap:2px;min-width:0}
+.item-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.item-date{font-size:.82rem;color:var(--muted)}.item-amt{font-weight:500;white-space:nowrap}
+.item-reason,.item-cat{font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
+.answer{display:grid;gap:8px;min-width:0}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.choices button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 8px;font-weight:500;min-height:46px;overflow-wrap:anywhere}
+.choices button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.memo{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:9px 10px;width:100%;min-width:0}
+.done{border:1px solid var(--ok);background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:12px 14px;font-weight:500}
+.fail{border:1px solid var(--bad);color:var(--bad);border-radius:10px;padding:12px 14px}
+.submit{display:grid;gap:10px}
+@media (min-width:720px){
+  .colhead{display:grid;grid-template-columns:4.2rem minmax(0,1fr) 7.5rem minmax(0,25rem);gap:14px;padding:8px 14px;font-size:.78rem;color:var(--muted);border-bottom:1px solid var(--line)}
+  .item{grid-template-columns:4.2rem minmax(0,1fr) 7.5rem minmax(0,25rem);gap:14px;align-items:start}
+  .item-top{display:contents}
+  .item-date{grid-column:1;grid-row:1}.item-main{grid-column:2;grid-row:1}.item-amt{grid-column:3;grid-row:1;text-align:right}.answer{grid-column:4;grid-row:1}
+  .choices{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .choices button{padding:8px 4px;min-height:40px;font-size:.88rem}
+}
+@media (prefers-reduced-motion:reduce){.progress .bar i{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap" id="root" aria-live="polite"></main>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const root=$('#root');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const won=n=>Math.round(n).toLocaleString('ko-KR')+'원';
+const cnt=n=>n.toLocaleString('ko-KR')+'건';
+const PHONE='032-321-4521';
+const enc=new TextEncoder(),dec=new TextDecoder();
+const unb64=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;};
+
+const K=((new URLSearchParams(location.search)).get('k')||'').toLowerCase();
+let FILE=null,P=null,A={},state={busy:false,err:'',submit:''};
+
+function msgPage(title,body){root.innerHTML='<div class="card"><h1>'+esc(title)+'</h1><p class="muted">'+esc(body)+'</p><p class="small muted">문의 '+PHONE+'</p></div>';}
+
+/* ---------- 열기 ---------- */
+async function init(){
+  if(!/^[a-z0-9]{4,32}$/.test(K)){msgPage('링크를 확인해 주세요','문자로 받으신 링크를 그대로 다시 열어 주세요.');return;}
+  try{
+    const r=await fetch(new URL('data/'+K+'.json',location.href).href,{cache:'no-store'});
+    if(!r.ok)throw new Error('http');
+    FILE=await r.json();
+  }catch(e){msgPage('링크가 만료되었거나 올바르지 않습니다','사무소에 새 링크를 요청해 주세요.');return;}
+  renderLock();
+}
+function renderLock(){
+  root.innerHTML='<form class="card" id="lock" autocomplete="off"><div><h1>카드 사용 내역 확인</h1><p class="muted small">원제우세무사사무소</p></div>'+
+   '<p>사업자등록번호 10자리와 문자로 받으신 6자리 숫자를 입력해 주세요.</p>'+
+   '<div class="field"><label for="biz">사업자등록번호</label><input id="biz" inputmode="numeric" placeholder="000-00-00000" autocomplete="off" required></div>'+
+   '<div class="field"><label for="pin">6자리 숫자</label><input id="pin" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="off" required></div>'+
+   '<p class="err" id="lock-err" role="alert">'+esc(state.err)+'</p>'+
+   '<button class="btn primary" id="lock-btn" type="submit">'+(state.busy?'확인 중...':'확인')+'</button>'+
+   '<p class="small muted">번호를 모르시면 사무소로 문의해 주세요. '+PHONE+'</p></form>';
+  $('#lock').addEventListener('submit',unlock);
+  $('#biz').focus();
+}
+async function unlock(e){
+  e.preventDefault();
+  if(state.busy)return;
+  const biz=$('#biz').value.replace(/\D/g,''),pin=$('#pin').value.replace(/\D/g,'');
+  if(biz.length!==10||pin.length!==6){state.err='사업자등록번호 10자리와 숫자 6자리를 모두 입력해 주세요.';renderLock();return;}
+  if(!(window.crypto&&crypto.subtle)){state.err='보안 연결(https)로 접속해야 열 수 있습니다. 주소가 https로 시작하는지 확인해 주세요.';renderLock();return;}
+  state.busy=true;state.err='';$('#lock-btn').disabled=true;$('#lock-btn').textContent='확인 중...';
+  try{
+    const iter=Math.min(Math.max(FILE.iter|0,100000),2000000);
+    const km=await crypto.subtle.importKey('raw',enc.encode(biz+':'+pin),'PBKDF2',false,['deriveKey']);
+    const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:unb64(FILE.salt),iterations:iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+    const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(FILE.iv),additionalData:enc.encode(K)},key,unb64(FILE.ct));
+    P=JSON.parse(dec.decode(pt));
+  }catch(err){
+    state.busy=false;state.err='입력하신 번호가 맞지 않습니다. 다시 확인해 주세요.';renderLock();return;
+  }
+  state.busy=false;
+  try{A=JSON.parse(localStorage.getItem('cr:'+K)||'{}')||{};}catch(x){A={};}
+  render();
+}
+
+/* ---------- 화면 ---------- */
+const CH=[['biz','사업 관련'],['personal','개인 사용'],['entertain','접대'],['unknown','모르겠음']];
+function choicesFor(it){return it.mode==='veh'?[['vA',P.vehA],['vB',P.vehB],['personal','개인 사용'],['unknown','모르겠음']]:CH;}
+function labelOf(v){const m={biz:'사업 관련',personal:'개인 사용',entertain:'접대',unknown:'모르겠음',vA:P.vehA,vB:P.vehB};return m[v]||'';}
+function saveDraft(){try{localStorage.setItem('cr:'+K,JSON.stringify(A));}catch(e){}}
+function summaryHTML(){
+  const t=P.totals,o=[t.Y[0]+t.N[0],t.Y[1]+t.N[1]];
+  return '<div class="card"><h2>이번 기간 카드 사용 요약</h2><div class="scroll"><table class="ledger"><thead><tr><th scope="col">구분</th><th scope="col">건수</th><th scope="col">금액</th></tr></thead><tbody>'+
+   '<tr><td>총 사용</td><td class="num">'+cnt(t.all[0])+'</td><td class="num">'+won(t.all[1])+'</td></tr>'+
+   '<tr><td>① 사무소 처리 완료</td><td class="num">'+cnt(o[0])+'</td><td class="num">'+won(o[1])+'</td></tr>'+
+   '<tr class="sub"><td><span class="badge b-ok">공제</span></td><td class="num">'+cnt(t.Y[0])+'</td><td class="num">'+won(t.Y[1])+'</td></tr>'+
+   '<tr class="sub"><td><span class="badge b-no">불공제</span></td><td class="num">'+cnt(t.N[0])+'</td><td class="num">'+won(t.N[1])+'</td></tr>'+
+   '<tr class="ask"><td>② 판단 요청</td><td class="num">'+cnt(t.R[0])+'</td><td class="num">'+won(t.R[1])+'</td></tr>'+
+   '</tbody></table></div><p class="note">총 사용 = ① 사무소 처리 + ② 판단 요청입니다. ② 건만 아래에서 확인해 주세요.</p></div>';
+}
+function criteriaHTML(){
+  const th=P.th.toLocaleString('ko-KR')+'원',crit=P.smallRule!=='nts',staffY=P.staff==='yes',v=P.vehicle;
+  const rows=[];
+  if(crit){
+    rows.push(['식비 (음식점·카페·편의점 등)',staffY?'ok':'no',staffY?'4대보험 가입 직원이 있어 직원 복리후생 식비로 보고 공제합니다.':'4대보험 가입 직원이 없어 대표자 개인 식사로 보고 불공제합니다.','사업과 직접 관련 없는 지출: 부가가치세법 제39조 제1항 제4호, 시행령 제77조 (기준 금액 미만 건)']);
+    rows.push(['마트·온라인쇼핑 등','no','개인 생활용품일 가능성이 있어 불공제합니다. 사업용이라면 알려 주세요.','사업과 직접 관련 없는 지출: 부가가치세법 제39조 제1항 제4호 (기준 금액 미만 건)']);
+  }else rows.push(['기준 금액 미만 건','no','국세청 자료의 공제·불공제 구분을 그대로 따릅니다.','']);
+  rows.push(['차량 관련 (주유·정비·주차·통행료)',v==='truck'?'ok':v==='both'?'ask':'no',
+    v==='both'?esc0(P.vehA)+'은 공제 대상, '+esc0(P.vehB)+'는 불공제입니다. 두 차량 지출이 구분되지 않아 금액과 관계없이 어느 차량인지 확인합니다.':
+    v==='truck'?'9인승 이상 승합·화물·경차의 업무용 유지비로 보고 공제합니다.':
+    v==='car'?'개별소비세 과세대상 8인승 이하 비영업용 승용차의 유지비라 불공제합니다.':'등록된 차량이 없어 사업 관련성을 확인할 수 없으므로 불공제합니다.',
+    '비영업용 소형승용차의 구입·임차·유지: 부가가치세법 제39조 제1항 제5호, 시행령 제78조']);
+  rows.push(['접대·유흥·개인 경비','no','접대비, 개인 경비로 분류된 지출, 골프·유흥·병원 등은 불공제합니다.','기업업무추진비 관련: 부가가치세법 제39조 제1항 제6호, 시행령 제79조 / 면세사업 관련: 제7호']);
+  rows.push(['세액이 없는 거래','no','면세 사업자 거래나 취소 건처럼 세액이 없는 건은 공제할 금액이 없습니다.','']);
+  return '<details class="criteria" open><summary>사무소가 처리한 기준 ('+th+' 미만 건 포함)</summary><div class="crit-body">'+
+   rows.map(r=>'<div class="crit"><div class="crit-head"><strong>'+esc(r[0])+'</strong><span class="badge '+(r[1]==='ok'?'b-ok':r[1]==='ask'?'b-ask':'b-no')+'">'+(r[1]==='ok'?'공제':r[1]==='ask'?'건별 확인':'불공제')+'</span></div><div>'+r[2]+'</div>'+(r[3]?'<div class="basis">'+esc(r[3])+'</div>':'')+'</div>').join('')+
+   '<p class="small muted" style="padding-top:12px;border-top:1px solid var(--line)">사무소 실무 기준입니다. 건별 사실관계에 따라 달라질 수 있어, 위에 해당하지 않는 사용은 아래 판단 요청으로 확인드립니다.</p></div></details>';
+}
+function esc0(s){return esc(s);}
+function itemHTML(it){
+  const a=A[it.id]||{};
+  return '<div class="item" data-id="'+esc(it.id)+'"><div class="item-top"><span class="item-date num">'+esc(it.d)+'</span><span class="item-amt num">'+won(it.a)+'</span></div>'+
+   '<div class="item-main"><span class="item-cat">'+esc(it.c||'업종 정보 없음')+'</span><span class="item-reason">'+esc(it.r)+'</span></div>'+
+   '<div class="answer"><div class="choices" role="group" aria-label="사용 목적">'+choicesFor(it).map(c=>'<button type="button" data-ans="'+c[0]+'" aria-pressed="'+(a.a===c[0])+'">'+esc(c[1])+'</button>').join('')+'</div>'+
+   '<input class="memo" type="text" data-memo maxlength="200" placeholder="메모 (선택)" aria-label="메모" value="'+esc(a.memo||'')+'"></div></div>';
+}
+function stats(){const done=P.reqs.filter(r=>A[r.id]&&A[r.id].a).length,pct=P.reqs.length?Math.round(done/P.reqs.length*100):100;return{done,pct};}
+function render(){
+  const y=window.scrollY,s=stats();
+  let h='<div><h1>'+esc(P.client)+' 카드 사용 확인</h1><p class="small muted">'+esc(P.period)+' · 회신 기한 '+esc(P.due)+' · 문의 '+PHONE+'</p></div>'+summaryHTML()+criteriaHTML();
+  h+='<div class="progress"><div class="line"><span><strong>판단 요청</strong> '+cnt(P.reqs.length)+' 중 <span class="num" id="p-done">'+s.done+'</span>건 응답</span><span class="num muted" id="p-pct">'+s.pct+'%</span></div><div class="bar"><i id="p-bar" style="width:'+s.pct+'%"></i></div></div>';
+  if(!P.reqs.length)h+='<div class="card"><p>확인이 필요한 건이 없습니다. 별도로 하실 일은 없습니다.</p></div>';
+  else{
+    const g=new Map();P.reqs.forEach(r=>{if(!g.has(r.m))g.set(r.m,[]);g.get(r.m).push(r);});
+    const arr=[...g.entries()].map(([m,items])=>({m,items:items.slice().sort((a,b)=>b.a-a.a),total:items.reduce((x,r)=>x+r.a,0)})).sort((a,b)=>b.total-a.total);
+    h+='<p class="small muted">금액이 큰 가맹점부터 보여 드립니다. 같은 가맹점은 한 번에 응답할 수 있습니다.</p>';
+    h+=arr.map(x=>{
+      const veh=x.items[0].mode==='veh';
+      const bulk=x.items.length>1?'<div class="bulk" data-m="'+esc(x.m)+'">'+(veh?'<button type="button" data-bulk="vA">전체 '+esc(P.vehA)+'</button><button type="button" data-bulk="vB">전체 '+esc(P.vehB)+'</button>':'<button type="button" data-bulk="biz">전체 사업 관련</button><button type="button" data-bulk="personal">전체 개인 사용</button>')+'</div>':'';
+      return '<section class="group"><div class="group-head"><div><div class="gname">'+esc(x.m)+'</div><div class="gsum num">'+cnt(x.items.length)+' · '+won(x.total)+'</div></div>'+bulk+'</div><div class="colhead"><span>일자</span><span>내용</span><span style="text-align:right">금액</span><span>사용 목적</span></div>'+x.items.map(itemHTML).join('')+'</section>';
+    }).join('');
+    h+='<div class="submit">';
+    if(state.submit==='ok')h+='<div class="done" role="status">제출했습니다. 응답 '+s.done+'건, 미응답 '+(P.reqs.length-s.done)+'건입니다. 수정하시면 다시 제출해 주세요.</div>';
+    if(state.submit==='demo')h+='<div class="done" role="status">시험 링크입니다. 응답은 전송되지 않았습니다.</div>';
+    if(state.submit==='fail')h+='<div class="fail" role="alert">전송하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요. 계속 안 되면 사무소로 연락해 주세요. '+PHONE+'</div>';
+    h+='<p class="small muted">회신 기한 안에 응답이 없는 건은 불공제로 처리합니다. 알려 주신 사용 목적이 사실과 다를 경우의 책임은 사용자에게 있습니다.</p>'+
+      '<button type="button" class="btn primary" id="btn-submit"'+(state.busy?' disabled':'')+'>'+(state.busy?'보내는 중...':state.submit==='ok'?'다시 제출하기':'제출하기')+'</button></div>';
+  }
+  root.innerHTML=h;
+  window.scrollTo(0,y);
+}
+function refresh(){const s=stats();const d=$('#p-done');if(d)d.textContent=s.done;const p=$('#p-pct');if(p)p.textContent=s.pct+'%';const b=$('#p-bar');if(b)b.style.width=s.pct+'%';}
+
+/* ---------- 이벤트 ---------- */
+root.addEventListener('click',e=>{
+  if(!P)return;
+  const ab=e.target.closest('[data-ans]');
+  if(ab){const id=ab.closest('.item').dataset.id,cur=A[id]||{};A[id]={a:cur.a===ab.dataset.ans?null:ab.dataset.ans,memo:cur.memo||''};state.submit='';saveDraft();render();return;}
+  const bb=e.target.closest('[data-bulk]');
+  if(bb){const m=bb.closest('.bulk').dataset.m;P.reqs.filter(r=>r.m===m).forEach(r=>{const cur=A[r.id]||{};A[r.id]={a:bb.dataset.bulk,memo:cur.memo||''};});state.submit='';saveDraft();render();return;}
+  if(e.target.id==='btn-submit')submit();
+});
+root.addEventListener('input',e=>{
+  if(P&&e.target.matches('[data-memo]')){const id=e.target.closest('.item').dataset.id,cur=A[id]||{};A[id]={a:cur.a||null,memo:e.target.value};saveDraft();}
+});
+async function submit(){
+  if(state.busy)return;
+  const items=P.reqs.map(r=>{const a=A[r.id]||{};return{id:r.id,date:r.d,merchant:r.m,amount:r.a,answer:a.a?labelOf(a.a):'',memo:a.memo||''};});
+  if(!P.api){state.submit='demo';render();return;}
+  state.busy=true;state.submit='';render();
+  try{
+    const res=await fetch(P.api,{method:'POST',body:JSON.stringify({k:K,items}),redirect:'follow'});
+    const j=await res.json();
+    if(!j||!j.ok)throw new Error('server');
+    state.submit='ok';
+  }catch(err){state.submit='fail';}
+  state.busy=false;render();
+}
+init();
+})();
+</script>
+</body>
+</html>
